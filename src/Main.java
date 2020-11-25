@@ -2,6 +2,7 @@ import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -18,6 +19,19 @@ public class Main extends Application {
         GridPane main_root=new GridPane();
         main_root=initGrid(main_root);
 
+        //shows that parents and children are actually correctly set#
+        System.out.println("\nNode " + nodes.get(11).getV() + " Parent and Child:");
+        try {
+            System.out.println(nodes.get(11).getParentN().getV());
+        }catch(Exception e){
+            System.out.println("Parent = null");
+        }
+        try {
+            System.out.println(nodes.get(11).getChild().getV());
+        }catch(Exception e){
+            System.out.println("Child = null");
+        }
+
         Scene primScene=new Scene(main_root);
         stage.setScene(primScene);
         stage.setTitle("Jumping Nodes");
@@ -26,25 +40,32 @@ public class Main extends Application {
 
     GridPane initGrid(GridPane pane){
         JumpNode parent=null;
-        JumpNode child=null;
+        JumpNode current;
+
+        int circleCount=15;
+
         Random random=new Random();
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < circleCount; i++) {
             boolean isSet=false;
             while (!isSet) {
                 int x = random.nextInt(10);
                 int y = random.nextInt(10);
                 if (getNodeFromGridPane(pane, x, y) == null) {
-                    if (parent!=null) {
-                        JumpNode current=new JumpNode(parent, i);
-                        pane.add(current, x, y);
+                    if (parent!=null && i<circleCount-1) {
+                        current=new JumpNode(parent, i);
+                        parent.setChild(current);
+                        System.out.println("Node " + parent.getV() + " Child ID: " + current.getV());
                         System.out.println("Node " + current.getV() + " Parent ID: " + parent.getV());
-                        parent=current;
+                    }else if (parent!=null && i==circleCount-1){
+                        current=new JumpNode(parent, i);
+                        System.out.println("Node " + current.getV() + " is the last Node with the Parent ID: " + parent.getV());
                     }else{
-                        JumpNode current=new JumpNode(i);
-                        pane.add(current, x, y);
+                        current=new JumpNode(i);
                         System.out.println("Node " + current.getV() + " is the first Node");
-                        parent=current;
                     }
+                    nodes.add(current);
+                    pane.add(current, x, y);
+                    parent=current;
                     isSet = true;
                 }
             }
